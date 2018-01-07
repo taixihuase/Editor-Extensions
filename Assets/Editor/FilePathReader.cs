@@ -12,13 +12,14 @@ namespace EditorExtensions
         public string extension;
         public bool isDirectory;
         public SortedList children;
+
+        public bool isOpen;         //节点是否展开
     }
 
     public class FilePathReader : Editor
     {
         public static SortedList fileMap = new SortedList();
 
-        [MenuItem("Tools/创建文件路径树")]
         public static void CreateSelectedFilePathTree()
         {
             fileMap.Clear();
@@ -126,7 +127,7 @@ namespace EditorExtensions
 
         private static void ShowAllPath(FileNode node)
         {
-            Debug.Log(node.path + "/" + node.name);
+            //Debug.Log(node.path + "/" + node.name);
             if (node.children != null)
             {
                 IList list = node.children.GetKeyList();
