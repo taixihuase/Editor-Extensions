@@ -6,7 +6,7 @@ namespace EditorExtensions
 {
     public class FileTreeCreator : EditorWindow
     {
-        private static FileTreeCreator instance = new FileTreeCreator();
+        private static FileTreeCreator instance;
 
         private static FileTreeCreator window;
 
@@ -24,6 +24,10 @@ namespace EditorExtensions
             window = GetWindow<FileTreeCreator>();
             window.titleContent = new GUIContent("文件路径树");
             window.Show();
+            if(instance == null)
+            {
+                instance = CreateInstance<FileTreeCreator>();
+            }
             instance.GetTreeRoot();
         }
 
@@ -37,26 +41,35 @@ namespace EditorExtensions
 
         private void OnGUI()
         {
+            if(root == null)
+            {
+                return;
+            }
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("根路径：", GUILayout.Width(44), GUILayout.Height(20));
+            GUIStyle style = new GUIStyle();
+            style.fontSize = 12;
+            style.normal.textColor = Color.white;
+
+            EditorGUILayout.LabelField("根路径：", style, GUILayout.Width(50), GUILayout.Height(20));
             string path = (root.path + "\\" + root.name).Replace('/', '\\');
-            EditorGUILayout.SelectableLabel(path, GUILayout.Height(20));
+            EditorGUILayout.SelectableLabel(path, style, GUILayout.Height(20));
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("当前路径：", GUILayout.Width(55), GUILayout.Height(20));
+            EditorGUILayout.LabelField("当前路径：", style, GUILayout.Width(62), GUILayout.Height(20));
             if (selectedNode != null)
             {
                 path = (selectedNode.path + "\\" + selectedNode.name).Replace('/', '\\');
-                EditorGUILayout.SelectableLabel(path, GUILayout.Height(20));
+                EditorGUILayout.SelectableLabel(path, style, GUILayout.Height(20));
             }
             else
             {
-                EditorGUILayout.LabelField("未选中任何文件");
+                EditorGUILayout.LabelField("未选中任何文件", style);
             }
             GUILayout.EndHorizontal();
 
             scrollPos = GUILayout.BeginScrollView(scrollPos);
+            GUILayout.Space(5);
             DrawTree(root, 0);
             GUILayout.EndScrollView();
 
@@ -81,7 +94,8 @@ namespace EditorExtensions
 
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.white;
-            if(node == selectedNode)
+            style.fontSize = 12;
+            if (node == selectedNode)
             {
                 style.normal.textColor = Color.green;
             }
@@ -90,7 +104,26 @@ namespace EditorExtensions
             if (node.isDirectory)
             {
                 GUILayout.Space(5 + level * 10);
-                node.isOpen = EditorGUILayout.Foldout(node.isOpen, node.name);
+                //node.isOpen = EditorGUILayout.Foldout(node.isOpen, node.name);
+                if (node.isOpen)
+                {
+                    if (GUILayout.Button("-", GUILayout.Width(18), GUILayout.Height(14)))
+                    {
+                        node.isOpen = false;
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button("+", GUILayout.Width(18), GUILayout.Height(14)))
+                    {
+                        node.isOpen = true;
+                    }
+                }
+                GUILayout.Space(2);
+                if (GUILayout.Button(node.name, style))
+                {
+                    selectedNode = node;
+                }
                 EditorGUILayout.EndHorizontal();
             }
             else
@@ -101,8 +134,8 @@ namespace EditorExtensions
                     selectedNode = node;
                 }
                 EditorGUILayout.EndHorizontal();
-                GUILayout.Space(5);
             }
+            GUILayout.Space(8);
 
             if (!node.isOpen || node.children == null || node.children.Count == 0)
             {
