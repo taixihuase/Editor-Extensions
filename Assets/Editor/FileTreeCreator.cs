@@ -95,8 +95,10 @@ namespace EditorExtensions
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.white;
             style.fontSize = 12;
+            Color normal = GUI.backgroundColor;
             if (node == selectedNode)
             {
+                GUI.backgroundColor = Color.green;
                 style.normal.textColor = Color.green;
             }
 
@@ -114,13 +116,16 @@ namespace EditorExtensions
                 }
                 else
                 {
-                    if (GUILayout.Button("+", GUILayout.Width(18), GUILayout.Height(14)))
+                    if (node.children == null || node.children.Count == 0)
+                    {
+                    }
+                    else if (GUILayout.Button("+", GUILayout.Width(18), GUILayout.Height(14)))
                     {
                         node.isOpen = true;
                     }
                 }
                 GUILayout.Space(2);
-                if (GUILayout.Button(node.name, style))
+                if (GUILayout.Button(node.name, GUILayout.Width(node.name.Length*12)))
                 {
                     selectedNode = node;
                 }
@@ -136,6 +141,7 @@ namespace EditorExtensions
                 EditorGUILayout.EndHorizontal();
             }
             GUILayout.Space(8);
+            GUI.backgroundColor = normal;
 
             if (!node.isOpen || node.children == null || node.children.Count == 0)
             {
